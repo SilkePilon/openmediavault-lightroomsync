@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+export PYTHONDONTWRITEBYTECODE=1
+
+%:
+	dh $@
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	cd tests && python3 -m unittest -v
+endif

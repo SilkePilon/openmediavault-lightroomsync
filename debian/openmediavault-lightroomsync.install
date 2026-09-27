@@ -1,0 +1,4 @@
+usr/sbin/* usr/sbin/
+usr/lib/openmediavault-lightroomsync/* usr/lib/openmediavault-lightroomsync/
+usr/share/openmediavault/* usr/share/openmediavault/
+srv/* srv/

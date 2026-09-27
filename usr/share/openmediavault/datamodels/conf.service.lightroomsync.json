@@ -1,0 +1,123 @@
+{
+	"type": "config",
+	"id": "conf.service.lightroomsync",
+	"title": "Lightroom Sync",
+	"queryinfo": {
+		"xpath": "/config/services/lightroomsync",
+		"iterable": false
+	},
+	"properties": {
+		"enable": {
+			"type": "boolean",
+			"default": false
+		},
+		"sharedfolderref": {
+			"type": "string",
+			"oneOf": [{
+				"type": "string",
+				"format": "uuidv4"
+			},{
+				"type": "string",
+				"maxLength": 0
+			}]
+		},
+		"subdir": {
+			"type": "string",
+			"pattern": "^(?!.*(^|/)\\.\\.(/|$))[^/].*$|^$",
+			"default": "Lightroom"
+		},
+		"username": {
+			"type": "string",
+			"default": ""
+		},
+		"clientid": {
+			"type": "string",
+			"default": ""
+		},
+		"clientsecret": {
+			"type": "string",
+			"default": ""
+		},
+		"redirecturi": {
+			"type": "string",
+			"pattern": "^https://.+$",
+			"default": "https://localhost/"
+		},
+		"source": {
+			"type": "string",
+			"enum": ["all", "albums"],
+			"default": "all"
+		},
+		"albums": {
+			"type": "string",
+			"default": ""
+		},
+		"hidestacked": {
+			"type": "boolean",
+			"default": false
+		},
+		"capturedafter": {
+			"type": "string",
+			"pattern": "^(\\d{4}-\\d{2}-\\d{2})?$",
+			"default": ""
+		},
+		"foldertemplate": {
+			"type": "string",
+			"default": "{year}/{year}-{month}"
+		},
+		"filenametemplate": {
+			"type": "string",
+			"minLength": 1,
+			"default": "{year}{month}{day}_{hour}{minute}{second}_{name}"
+		},
+		"rendition": {
+			"type": "string",
+			"enum": ["fullsize", "2560", "2048", "1280", "640"],
+			"default": "2048"
+		},
+		"renditionfallback": {
+			"type": "boolean",
+			"default": true
+		},
+		"maxdimension": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 20000,
+			"default": 0
+		},
+		"jpegquality": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 100,
+			"default": 92
+		},
+		"keepmetadata": {
+			"type": "boolean",
+			"default": true
+		},
+		"setmtime": {
+			"type": "boolean",
+			"default": true
+		},
+		"redownloadedited": {
+			"type": "boolean",
+			"default": true
+		},
+		"deletemode": {
+			"type": "string",
+			"enum": ["keep", "trash", "delete"],
+			"default": "keep"
+		},
+		"schedule": {
+			"type": "string",
+			"enum": ["manual", "hourly", "6h", "daily", "weekly"],
+			"default": "daily"
+		},
+		"concurrency": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 16,
+			"default": 4
+		}
+	}
+}

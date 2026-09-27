@@ -1,0 +1,18 @@
+Source: openmediavault-lightroomsync
+Section: net
+XB-Plugin-Section: utilities
+Priority: optional
+Maintainer: Silke Pilon <silkepilon2009@gmail.com>
+Build-Depends: debhelper-compat (= 13), python3, python3-pil
+Standards-Version: 4.6.2
+Homepage: https://github.com/SilkePilon/openmediavault-lightroomsync
+Rules-Requires-Root: no
+
+Package: openmediavault-lightroomsync
+Architecture: all
+Depends: openmediavault (>= 7.0), python3 (>= 3.9), python3-pil, ${misc:Depends}
+Description: openmediavault Adobe Lightroom sync plugin
+ Downloads the photos of an Adobe Lightroom (cloud) library, or selected
+ albums, to a shared folder on a schedule. Folder structure, file names,
+ resolution, downscaling, metadata handling and the treatment of photos
+ removed in Lightroom are configurable.

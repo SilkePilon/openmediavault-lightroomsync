@@ -1,0 +1,62 @@
+[{
+	"type": "rpc",
+	"id": "rpc.lightroomsync.setaccount",
+	"params": {
+		"type": "object",
+		"properties": {
+			"clientid": {
+				"type": "string",
+				"required": true
+			},
+			"clientsecret": {
+				"type": "string",
+				"required": true
+			},
+			"redirecturi": {
+				"type": "string",
+				"pattern": "^https://.+$",
+				"required": true
+			}
+		}
+	}
+},{
+	"type": "rpc",
+	"id": "rpc.lightroomsync.completeauth",
+	"params": {
+		"type": "object",
+		"properties": {
+			"clientid": {
+				"type": "string",
+				"minLength": 1,
+				"required": true
+			},
+			"clientsecret": {
+				"type": "string",
+				"minLength": 1,
+				"required": true
+			},
+			"redirecturi": {
+				"type": "string",
+				"pattern": "^https://.+$",
+				"required": true
+			},
+			"authresponse": {
+				"type": "string",
+				"minLength": 1,
+				"required": true
+			}
+		}
+	}
+},{
+	"type": "rpc",
+	"id": "rpc.lightroomsync.sync",
+	"params": {
+		"type": "object",
+		"properties": {
+			"dryrun": {
+				"type": "boolean",
+				"required": true
+			}
+		}
+	}
+}]

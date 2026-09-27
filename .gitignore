@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+/debian/.debhelper/
+/debian/openmediavault-lightroomsync/
+/debian/files
+/debian/*.substvars
+/debian/debhelper-build-stamp

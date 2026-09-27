@@ -1,0 +1,8 @@
+version: "1.0"
+type: route
+data:
+  url: "/services/lightroomsync/account"
+  title: _("Adobe Account")
+  editing: true
+  notificationTitle: _("Updated Adobe account settings.")
+  component: omv-services-lightroomsync-account-form-page

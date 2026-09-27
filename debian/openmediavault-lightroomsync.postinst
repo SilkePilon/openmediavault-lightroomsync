@@ -1,0 +1,42 @@
+#!/usr/bin/env dash
+#
+# This file is part of openmediavault-lightroomsync.
+#
+# @license   https://www.gnu.org/licenses/gpl.html GPL Version 3
+
+set -e
+
+. /etc/default/openmediavault
+. /usr/share/openmediavault/scripts/helper-functions
+
+case "$1" in
+	configure)
+		########################################################################
+		# Activate trigger to rebuild workbench configuration files.
+		########################################################################
+		dpkg-trigger update-workbench
+
+		########################################################################
+		# Initialize and migrate configuration database.
+		########################################################################
+		echo "Updating configuration database ..."
+		omv-confdbadm create "conf.service.lightroomsync"
+		if [ -n "$2" ]; then
+			omv-confdbadm migrate "conf.service.lightroomsync" "${2}"
+			# Re-render the runtime configuration and units on upgrade.
+			omv_module_set_dirty lightroomsync
+		fi
+	;;
+
+	abort-upgrade|abort-remove|abort-deconfigure)
+	;;
+
+	*)
+		echo "postinst called with unknown argument '$1'" >&2
+		exit 1
+	;;
+esac
+
+#DEBHELPER#
+
+exit 0

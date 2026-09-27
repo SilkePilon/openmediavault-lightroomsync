@@ -1,0 +1,242 @@
+version: "1.0"
+type: component
+data:
+  name: omv-services-lightroomsync-settings-form-page
+  type: formPage
+  config:
+    request:
+      service: LightroomSync
+      get:
+        method: getSettings
+      post:
+        method: setSettings
+    fields:
+      - type: checkbox
+        name: enable
+        label: _("Enabled")
+        hint: _("Activate the sync. Choose <em>Manually only</em> as schedule to sync only when you press <em>Sync now</em> on the Status page.")
+        value: false
+      - type: select
+        name: schedule
+        label: _("Schedule")
+        value: "daily"
+        store:
+          data:
+            - - "manual"
+              - _("Manually only")
+            - - "hourly"
+              - _("Every hour")
+            - - "6h"
+              - _("Every 6 hours")
+            - - "daily"
+              - _("Daily")
+            - - "weekly"
+              - _("Weekly")
+
+      - type: divider
+        title: _("Destination")
+      - type: sharedFolderSelect
+        name: sharedfolderref
+        label: _("Shared folder")
+        hasEmptyOption: true
+        value: ""
+        validators:
+          requiredIf:
+            operator: truthy
+            arg0:
+              prop: enable
+      - type: textInput
+        name: subdir
+        label: _("Subfolder")
+        hint: _("Folder inside the shared folder that receives the photos. Leave empty to use the shared folder itself.")
+        value: "Lightroom"
+        validators:
+          pattern:
+            pattern: "^(?!.*(^|/)\\.\\.(/|$))[^/].*$|^$"
+            errorData: _("Use a relative path without '..'.")
+      - type: select
+        name: username
+        label: _("File owner")
+        hint: _("Downloaded files and folders are owned by this user and the group 'users'.")
+        hasEmptyOption: true
+        value: ""
+        valueField: name
+        textField: name
+        store:
+          proxy:
+            service: UserMgmt
+            get:
+              method: enumerateAllUsers
+              params:
+                detail: basic
+          sorters:
+            - dir: asc
+              prop: name
+
+      - type: divider
+        title: _("What to sync")
+      - type: select
+        name: source
+        label: _("Source")
+        value: "all"
+        store:
+          data:
+            - - "all"
+              - _("Whole library")
+            - - "albums"
+              - _("Selected albums")
+      - type: select
+        name: albums
+        label: _("Albums")
+        hint: _("Sign in on the Adobe Account page first to see your albums. A photo that is in several selected albums is saved once per album.")
+        multiple: true
+        value: []
+        valueField: id
+        textField: name
+        store:
+          proxy:
+            service: LightroomSync
+            get:
+              method: getAlbums
+        modifiers:
+          - type: visible
+            constraint:
+              operator: eq
+              arg0:
+                prop: source
+              arg1: "albums"
+        validators:
+          requiredIf:
+            operator: and
+            arg0:
+              operator: truthy
+              arg0:
+                prop: enable
+            arg1:
+              operator: eq
+              arg0:
+                prop: source
+              arg1: "albums"
+      - type: textInput
+        name: capturedafter
+        label: _("Only photos taken on or after")
+        hint: _("Optional date in the format YYYY-MM-DD.")
+        value: ""
+        placeholder: "YYYY-MM-DD"
+        validators:
+          pattern:
+            pattern: "^(\\d{4}-\\d{2}-\\d{2})?$"
+            errorData: _("Use the format YYYY-MM-DD.")
+      - type: checkbox
+        name: hidestacked
+        label: _("Skip stacked photos")
+        hint: _("Only download the top photo of each stack. Applies to whole-library sync.")
+        value: false
+
+      - type: divider
+        title: _("Folders and file names")
+      - type: hint
+        hintType: tip
+        text: _("Available tokens - <code>{year}</code> <code>{month}</code> <code>{monthname}</code> <code>{day}</code> <code>{hour}</code> <code>{minute}</code> <code>{second}</code> <code>{name}</code> (original file name) <code>{id}</code> <code>{id8}</code> <code>{album}</code> <code>{albumpath}</code> (album sync only). Use <code>/</code> in the folder template for subfolders. Existing files are renamed, not downloaded again, when you change a template. Files that would get the same name receive a suffix like <code>_2</code>; files not created by this plugin are never overwritten.")
+      - type: textInput
+        name: foldertemplate
+        label: _("Folder template")
+        hint: _("For example <code>{year}/{year}-{month}</code>, <code>{albumpath}</code>, <code>{year}/{album}</code>. Leave empty to put all photos in one folder.")
+        value: "{year}/{year}-{month}"
+      - type: textInput
+        name: filenametemplate
+        label: _("File name template")
+        hint: _("Without extension; <code>.jpg</code> is added. For example <code>{year}{month}{day}_{hour}{minute}{second}_{name}</code>.")
+        value: "{year}{month}{day}_{hour}{minute}{second}_{name}"
+        validators:
+          required: true
+      - type: checkbox
+        name: setmtime
+        label: _("Set file date to capture date")
+        hint: _("Lets file browsers and photo apps sort the files by when the photo was taken.")
+        value: true
+
+      - type: divider
+        title: _("Resolution and quality")
+      - type: select
+        name: rendition
+        label: _("Resolution")
+        hint: _("Adobe delivers edited JPEG renditions; original files (e.g. RAW) cannot be downloaded through the Lightroom API. <em>Full size</em> and <em>2560 px</em> are rendered on demand and require Adobe to enable them for your API key; otherwise the next smaller size is used when fallback is enabled.")
+        value: "2048"
+        store:
+          data:
+            - - "fullsize"
+              - _("Full size (original resolution, with edits)")
+            - - "2560"
+              - _("2560 px long edge")
+            - - "2048"
+              - _("2048 px long edge")
+            - - "1280"
+              - _("1280 px long edge")
+            - - "640"
+              - _("640 px long edge")
+      - type: checkbox
+        name: renditionfallback
+        label: _("Fall back to smaller sizes")
+        hint: _("If the chosen size is not available, download the next smaller one instead of skipping the photo.")
+        value: true
+      - type: numberInput
+        name: maxdimension
+        label: _("Limit long edge (px)")
+        hint: _("Downscale larger photos on the NAS to save space. 0 keeps the downloaded size.")
+        value: 0
+        validators:
+          min: 0
+          max: 20000
+          patternType: numeric
+      - type: slider
+        name: jpegquality
+        label: _("JPEG quality")
+        hint: _("Only used when a photo is downscaled or its metadata is removed; otherwise the file from Adobe is saved unchanged.")
+        value: 92
+        validators:
+          min: 50
+          max: 100
+      - type: checkbox
+        name: keepmetadata
+        label: _("Keep metadata")
+        hint: _("Keep EXIF data such as camera, exposure and GPS location. Disable to strip it, e.g. for privacy.")
+        value: true
+
+      - type: divider
+        title: _("Changes and removals")
+      - type: checkbox
+        name: redownloadedited
+        label: _("Update edited photos")
+        hint: _("Download a photo again when it was changed in Lightroom, e.g. after editing.")
+        value: true
+      - type: select
+        name: deletemode
+        label: _("When a photo is removed in Lightroom")
+        hint: _("Also applies when a photo is removed from a selected album. As a safety measure a sync never removes more than half of the synced files unless started with <code>omv-lightroomsync sync --allow-mass-delete</code>.")
+        value: "keep"
+        store:
+          data:
+            - - "keep"
+              - _("Keep the local file")
+            - - "trash"
+              - _("Move it to the .lightroom-trash folder")
+            - - "delete"
+              - _("Delete the local file")
+
+      - type: divider
+        title: _("Performance")
+      - type: numberInput
+        name: concurrency
+        label: _("Parallel downloads")
+        value: 4
+        validators:
+          min: 1
+          max: 16
+          patternType: numeric
+    buttons:
+      - template: submit
+      - template: cancel
+        execute:
+          type: url
+          url: "/services/lightroomsync"

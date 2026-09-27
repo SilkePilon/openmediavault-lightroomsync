@@ -1,0 +1,51 @@
+version: "1.0"
+type: component
+data:
+  name: omv-services-lightroomsync-status-form-page
+  type: formPage
+  config:
+    request:
+      service: LightroomSync
+      get:
+        method: getStatus
+    fields:
+      - type: textarea
+        name: status
+        label: _("Status")
+        readonly: true
+        monospace: true
+        rows: 8
+        submitValue: false
+      - type: hint
+        hintType: info
+        text: _("Scheduled syncs run in the background; their output is shown under <em>Diagnostics | System Logs | Lightroom Sync</em>. A dry run lists what would be downloaded, renamed or removed without changing any files.")
+    buttons:
+      - text: _("Dry run")
+        execute:
+          type: taskDialog
+          taskDialog:
+            config:
+              title: _("Lightroom Sync - dry run")
+              startOnInit: true
+              request:
+                service: LightroomSync
+                method: sync
+                params:
+                  dryrun: true
+      - text: _("Sync now")
+        execute:
+          type: taskDialog
+          taskDialog:
+            config:
+              title: _("Lightroom Sync")
+              startOnInit: true
+              request:
+                service: LightroomSync
+                method: sync
+                params:
+                  dryrun: false
+            successUrl: "/services/lightroomsync/status"
+      - template: back
+        execute:
+          type: url
+          url: "/services/lightroomsync"

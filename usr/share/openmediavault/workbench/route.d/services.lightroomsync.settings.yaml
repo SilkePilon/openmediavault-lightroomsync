@@ -1,0 +1,8 @@
+version: "1.0"
+type: route
+data:
+  url: "/services/lightroomsync/settings"
+  title: _("Settings")
+  editing: true
+  notificationTitle: _("Updated Lightroom Sync settings.")
+  component: omv-services-lightroomsync-settings-form-page

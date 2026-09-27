@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+# Command line entry point of the openmediavault Lightroom Sync plugin.
+import sys
+
+sys.path.insert(0, "/usr/lib/openmediavault-lightroomsync")
+
+from omv_lightroomsync.cli import main  # noqa: E402
+
+sys.exit(main())

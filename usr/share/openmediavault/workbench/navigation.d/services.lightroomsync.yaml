@@ -1,0 +1,7 @@
+version: "1.0"
+type: navigation-item
+data:
+  path: "services.lightroomsync"
+  text: _("Lightroom Sync")
+  icon: "mdi:cloud-download"
+  url: "/services/lightroomsync"

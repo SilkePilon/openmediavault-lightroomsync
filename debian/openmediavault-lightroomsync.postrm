@@ -1,0 +1,45 @@
+#!/usr/bin/env dash
+#
+# This file is part of openmediavault-lightroomsync.
+#
+# @license   https://www.gnu.org/licenses/gpl.html GPL Version 3
+
+set -e
+
+. /etc/default/openmediavault
+. /usr/share/openmediavault/scripts/helper-functions
+
+remove_action() {
+	# Activate trigger to rebuild workbench configuration files.
+	dpkg-trigger update-workbench
+}
+
+case "$1" in
+	purge)
+		remove_action
+		# omv-confdbadm cannot be used here because the data model has
+		# already been removed, see https://wiki.debian.org/MaintainerScripts.
+		echo "Cleaning up configuration database ..."
+		omv_config_delete "/config/services/lightroomsync"
+		# Adobe tokens, sync state and the rendered configuration. The
+		# downloaded photos in the shared folder are left untouched.
+		rm -rf /var/lib/openmediavault-lightroomsync \
+			/etc/openmediavault-lightroomsync
+	;;
+
+	remove)
+		remove_action
+	;;
+
+	upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+	;;
+
+	*)
+		echo "postrm called with unknown argument '$1'" >&2
+		exit 1
+	;;
+esac
+
+#DEBHELPER#
+
+exit 0

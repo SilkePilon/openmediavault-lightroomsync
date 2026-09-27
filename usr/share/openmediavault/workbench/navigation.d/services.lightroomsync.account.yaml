@@ -1,0 +1,8 @@
+version: "1.0"
+type: navigation-item
+data:
+  path: "services.lightroomsync.account"
+  position: 20
+  text: _("Adobe Account")
+  icon: "mdi:account-key"
+  url: "/services/lightroomsync/account"

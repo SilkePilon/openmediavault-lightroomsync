@@ -1,0 +1,109 @@
+version: "1.0"
+type: component
+data:
+  name: omv-services-lightroomsync-account-form-page
+  type: formPage
+  config:
+    request:
+      service: LightroomSync
+      get:
+        method: getAccount
+      post:
+        method: setAccount
+    hints:
+      - type: info
+        dismissible: true
+        stateId: 7f9f6a0e-2b0c-4c1e-9d59-2f7f0c6b6a11
+        text: _("<b>One-time setup:</b> Adobe only lets registered applications read Lightroom libraries, so you register your own (free):<ol><li>Open the <a href='https://developer.adobe.com/console' target='_blank'>Adobe Developer Console</a> and create a project.</li><li>Add the <em>Lightroom Services</em> API and choose the <em>OAuth Web App</em> credential.</li><li>Set <em>Default redirect URI</em> to <code>https://localhost/</code> and <em>Redirect URI pattern</em> to <code>https://localhost/.*</code>.</li><li>Under <em>Beta users</em>, add the e-mail address of your Adobe account.</li><li>Copy the client ID and client secret into the fields below.</li></ol>")
+    fields:
+      - type: textInput
+        name: authstatus
+        label: _("Status")
+        readonly: true
+        submitValue: false
+        value: ""
+      - type: divider
+        title: _("Adobe credentials")
+      - type: textInput
+        name: clientid
+        label: _("Client ID")
+        hint: _("Also called the API key.")
+        value: ""
+        autocomplete: "off"
+      - type: passwordInput
+        name: clientsecret
+        label: _("Client secret")
+        value: ""
+        autocomplete: "new-password"
+      - type: textInput
+        name: redirecturi
+        label: _("Redirect URI")
+        hint: _("Must match the default redirect URI of your Adobe credential. It does not need to load; you only copy it from the address bar.")
+        value: "https://localhost/"
+        validators:
+          required: true
+          pattern:
+            pattern: "^https://.+$"
+            errorData: _("Adobe requires an https:// redirect URI.")
+      - type: divider
+        title: _("Sign in")
+      - type: paragraph
+        title: _("1. Open the Adobe sign-in page in a new tab and sign in. Afterwards the browser shows an error page for the redirect URI - that is expected.")
+      - type: button
+        name: signin
+        text: _("Open Adobe sign-in")
+        submitValue: false
+        request:
+          service: LightroomSync
+          method: getAuthUrl
+          params:
+            clientid: "{{ clientid }}"
+            clientsecret: "{{ clientsecret }}"
+            redirecturi: "{{ redirecturi }}"
+          successUrl: "/externalRedirect/{{ _response.url | encodeuricomponent }}"
+      - type: paragraph
+        title: _("2. Copy the complete URL from the address bar of that error page, paste it here and press Complete sign-in.")
+      - type: textInput
+        name: authresponse
+        label: _("Redirected URL")
+        placeholder: "https://localhost/?code=..."
+        submitValue: false
+        value: ""
+      - type: button
+        name: completeauth
+        text: _("Complete sign-in")
+        submitValue: false
+        modifiers:
+          - type: enabled
+            constraint:
+              operator: truthy
+              arg0:
+                prop: authresponse
+        request:
+          service: LightroomSync
+          method: completeAuth
+          progressMessage: _("Signing in to Adobe ...")
+          params:
+            clientid: "{{ clientid }}"
+            clientsecret: "{{ clientsecret }}"
+            redirecturi: "{{ redirecturi }}"
+            authresponse: "{{ authresponse }}"
+          successNotification: "{{ _response.message }}"
+          successUrl: "/services/lightroomsync/status"
+      - type: divider
+        title: _("Sign out")
+      - type: button
+        name: logout
+        text: _("Sign out")
+        submitValue: false
+        request:
+          service: LightroomSync
+          method: logout
+          successNotification: _("Signed out of Adobe.")
+          successUrl: "/services/lightroomsync/status"
+    buttons:
+      - template: submit
+      - template: cancel
+        execute:
+          type: url
+          url: "/services/lightroomsync"
